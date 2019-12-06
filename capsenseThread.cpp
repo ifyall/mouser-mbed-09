@@ -4,23 +4,11 @@
 #include "cycfg.h"
 #include "temperature.h"
 
-
-/***************************************************************************
-* Global constants
-***************************************************************************/
-#define SLIDER_NUM_TOUCH                        (1u)    /* Number of touches on the slider */
-#define CAPSENSE_SCAN_PERIOD_MS                 (20u)   /* defines periodicity of \
-                        the CapSense scan and touch processing - in milliseconds */
-
-
 /***************************************
 * Function Prototypes
 **************************************/
-void ProcessTouchStatus(void);
 void CapSense_InterruptHandler(void);
 void CapSenseEndOfScanCallback(cy_stc_active_scan_sns_t * ptrActiveScan);
-void InitCapSenseClock(void);
-
 
 /*******************************************************************************
 * Interrupt configuration
@@ -31,23 +19,14 @@ const cy_stc_sysint_t CapSense_ISR_cfg =
     .intrPriority = 4u
 };
 
-
-
 /*******************************************************************************
 * Global variables
 *******************************************************************************/
-DigitalOut ledStatus(LED_RED);
 Semaphore capsense_sem;
-EventQueue queue;
 
-
-
-
-
-int capsenseThread(void)
+void capsenseThread(void)
 {
- 
-    
+
     /* Configure AMUX bus for CapSense */
     init_cycfg_routing();
     /* Configure PERI clocks for CapSense */
@@ -69,7 +48,6 @@ int capsenseThread(void)
     Cy_CapSense_Enable(&cy_capsense_context);
     Cy_CapSense_RegisterCallback(CY_CAPSENSE_END_OF_SCAN_E, CapSenseEndOfScanCallback, &cy_capsense_context);
 
- 
     Cy_CapSense_ScanAllWidgets(&cy_capsense_context);  
     
     
