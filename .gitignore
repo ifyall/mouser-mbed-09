@@ -1,0 +1,10 @@
+.build
+.mbed
+projectfiles
+*.py*
+mbed-os
+BUILD
+
+mbed-os-emwin-st7789v
+emwin
+capsense
