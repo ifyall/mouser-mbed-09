@@ -4,5 +4,7 @@
 void temperatureThread();
 
 void tempSendUpdateCurrentSetPointF(float delta);
+void tempSendUpdateSetpointF(float setPoint);
+
 
 #endif

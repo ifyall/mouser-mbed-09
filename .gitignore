@@ -9,3 +9,5 @@ mbed-os-emwin-st7789v
 emwin
 capsense
 ntp-client
+aws-iot
+connectivity-utilities

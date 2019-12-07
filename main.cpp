@@ -5,13 +5,16 @@
 #include "displayThread.h"
 #include "capsenseThread.h"
 #include "ntpThread.h"
+#include "awsThread.h"
 
 Thread blinkThreadHandle;
 Thread temperatureThreadHandle;
 Thread displayThreadHandle;
 Thread capsenseThreadHandle;
 Thread ntpThreadHandle;
+Thread awsThreadHandle;
 Semaphore WiFiSemaphore;
+
 WiFiInterface *wifi;
 
 // wifiStatusCallback
@@ -37,11 +40,6 @@ int main()
 {
 
     printf("Started System\n");
-#if 0
-    ThisThread::sleep_for(2000); // If for some reason it doesnt work wait 2s and try again
-    printf("Sleep done\n");
-    ThisThread::sleep_for(2000); // If for some reason it doesnt work wait 2s and try again
-#endif
 
     int ret;
     wifi = WiFiInterface::get_default_instance();
@@ -49,16 +47,15 @@ int main()
     while(1)
     {
         do {
-            printf("Attempting connect\n");
             ret = wifi->connect("CYFI_IOT_EXT", "cypresswicedwifi101", NSAPI_SECURITY_WPA_WPA2);
             if (ret != 0) {
             ThisThread::sleep_for(2000); // If for some reason it doesnt work wait 2s and try again
             }
         } while(ret !=0);
-        printf("Started WiFI\n");
 
         if(blinkThreadHandle.get_state() == Thread::Deleted)
         {
+            awsThreadHandle.start(awsThread);
             ntpThreadHandle.start(ntpThread);
             blinkThreadHandle.start(blinkThread);
             displayThreadHandle.start(displayThread);
@@ -68,5 +65,3 @@ int main()
         WiFiSemaphore.acquire();
     }
 }
-
-

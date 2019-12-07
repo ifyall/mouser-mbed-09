@@ -10,24 +10,22 @@ typedef enum {
     CMD_setPoint,
     CMD_time,
     CMD_mode,
-
-
 } command_t;
 
 
 typedef struct {
     command_t cmd;
     float    value;
-} displaymsg_t;
+} msg_t;
 
 
-static Queue<displaymsg_t, 32> queue;
-static MemoryPool<displaymsg_t, 16> mpool;
+static Queue<msg_t, 32> queue;
+static MemoryPool<msg_t, 16> mpool;
 
 
 void displaySendUpdateTemp(float temperature)
 {
-    displaymsg_t *message = mpool.alloc();
+    msg_t *message = mpool.alloc();
     if(message)
     {
         message->cmd = CMD_temperature;
@@ -38,7 +36,7 @@ void displaySendUpdateTemp(float temperature)
 
 void displaySendUpdateTime()
 {
-    displaymsg_t *message = mpool.alloc();
+    msg_t *message = mpool.alloc();
     if(message)
     {
         message->cmd = CMD_time;
@@ -49,7 +47,7 @@ void displaySendUpdateTime()
 
 void displaySendUpdateSetPoint(float setPoint)
 {
-    displaymsg_t *message = mpool.alloc();
+    msg_t *message = mpool.alloc();
     if(message)
     {
         message->cmd = CMD_setPoint;
@@ -61,7 +59,7 @@ void displaySendUpdateSetPoint(float setPoint)
 
 void displaySendUpdateMode(float mode)
 {
-    displaymsg_t *message = mpool.alloc();
+    msg_t *message = mpool.alloc();
     if(message)
     {
         message->cmd = CMD_mode;
@@ -70,33 +68,15 @@ void displaySendUpdateMode(float mode)
     }
 }
 
-void guiInit()
-{
-    printf("\033[2J\033[H"); // Clear Screen and go Home
-    printf("\033[?25l"); // Turn the cursor off
-    fflush(stdout);
-
-    #ifdef TARGET_CY8CKIT_062_WIFI_BT
-    GUI_Init();
-    GUI_SetColor(GUI_WHITE);
-    GUI_SetBkColor(GUI_BLACK);
-    GUI_SetFont(GUI_FONT_8X16_1);
-    GUI_SetTextAlign(GUI_TA_CENTER);
-    #endif
-
-}
-
-void displayAtXY(int x, int y,char *buffer)
+static void displayAtXY(int x, int y,char *buffer)
 {
     #ifdef TARGET_CY8CKIT_062_WIFI_BT
     GUI_SetTextAlign(GUI_TA_LEFT);
     GUI_DispStringAt(buffer,(x-1)*8,(y-1)*16);
-
     #endif
     // row column
     printf("\033[%d;%dH%s",y,x,buffer);
     fflush(stdout);
-
 }
 
 
@@ -104,15 +84,24 @@ void displayAtXY(int x, int y,char *buffer)
 
 void displayThread()
 {
-    guiInit();
-
     char buffer[128];
+
+    printf("\033[2J\033[H"); // Clear Screen and go Home
+    printf("\033[?25l"); // Turn the cursor off
+    fflush(stdout);
+
+    #ifdef TARGET_CY8CKIT_062_WIFI_BT
+        GUI_Init();
+        GUI_SetColor(GUI_WHITE);
+        GUI_SetBkColor(GUI_BLACK);
+        GUI_SetFont(GUI_FONT_8X16_1);
+    #endif
 
     while(1)
     {
         osEvent evt = queue.get();
         if (evt.status == osEventMessage) {
-            displaymsg_t *message = (displaymsg_t*)evt.value.p;
+            msg_t *message = (msg_t*)evt.value.p;
             switch(message->cmd)
             {
                 case CMD_temperature:
@@ -147,5 +136,4 @@ void displayThread()
 
         }
     }
-
 }

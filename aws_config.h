@@ -1,0 +1,85 @@
+
+/* Change endpoint address, thing name & topic based on your AWS IoT account configurations. Below values are just for reference */
+#define AWSIOT_ENDPOINT_ADDRESS             "a1c0l0bpd6pon3-ats.iot.us-east-2.amazonaws.com"
+#define AWSIOT_THING_NAME                   "AwsIoT_Subscriber"
+
+/* Make sure Client-ID is unique for each AWS IoT connection */
+#define AWSIOT_CLIENT_ID 					"AwsIoT subscriber APP"
+#define AWSIOT_TOPIC                        "thermostat"
+
+/* Change device certificate and device private key based on your account */
+// certificate
+const char SSL_CLIENTCERT_PEM[] =  \
+"-----BEGIN CERTIFICATE-----\n\
+MIIDWjCCAkKgAwIBAgIVAJ4u/gU7NxWiV2NwBRTFJk/mPPkvMA0GCSqGSIb3DQEB\n\
+CwUAME0xSzBJBgNVBAsMQkFtYXpvbiBXZWIgU2VydmljZXMgTz1BbWF6b24uY29t\n\
+IEluYy4gTD1TZWF0dGxlIFNUPVdhc2hpbmd0b24gQz1VUzAeFw0xOTA3MDMxMTM5\n\
+MTZaFw00OTEyMzEyMzU5NTlaMB4xHDAaBgNVBAMME0FXUyBJb1QgQ2VydGlmaWNh\n\
+dGUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCxEvKkPa6Fk1mC188C\n\
+5fwzdkU1hwFT8Ee6Ub0ImsRMrCaNc5WPWX1T9OW7en+EYgUSGuRuq3VIa88SPzHt\n\
+TmTIKkl17UmiM5tbibZLlPta5fF3klBj6upaTKu/Cn/Uc8UtEHefc6ikZpRycRnB\n\
+6CwzOdRyyL6RnCtQOSoFYUhBsQQqNbxTNnGqZuY1IKwlBccK/04+sp16KwGeRCul\n\
+GRPPi5IbfJkjqMbtpzHdRmQxxzoO8OhtvPw+gGKxmrglwq2HClB2JXVF1LhqoJzT\n\
+Crkm/sO+GJ+o1ys4rc9P7ORyTzaOogJUN3nw2RjpjRREjKqM8I88iW0JusAH/67j\n\
+Wuu1AgMBAAGjYDBeMB8GA1UdIwQYMBaAFIJyQZprW3SRNIXe+X22/uZ6sdO9MB0G\n\
+A1UdDgQWBBT+al32O2+dH5qoClpyEWRRoMk6oTAMBgNVHRMBAf8EAjAAMA4GA1Ud\n\
+DwEB/wQEAwIHgDANBgkqhkiG9w0BAQsFAAOCAQEAoRg4QETRC1rMKJytxthLuGDj\n\
+WtB9Zow3TONnq1HZ4yMUQFQeflYCZ96khBuWu91cj2iZengikEJkl+6HGCL+9ZKA\n\
+ybWPRyQNvJQ13ju/iQyl89ZIbYh5UGmGrk6G8ryyvPezVP8AxpB5usz9YxTTz/m6\n\
+eQMs38zUK5Dv4297NBJ6Xxwoqb8ivJkHEmnkDxKeErd4Qb7Q9ukWYlo5ksjqib8F\n\
+NYTv8fhcx4S3UFhbNB+z/iaGtJXk7WIzgGpSX/CiRtGcV776c94LdgIfIZ9DpLgi\n\
+GWSrCjsCr6yNtc708vwC+0jKoBcrk3HdVII2N4ciNuzJaoGyuHi+YuiXnO8kbg==\n\
+-----END CERTIFICATE-----";
+
+// Private key
+const char SSL_CLIENTKEY_PEM[] = \
+"-----BEGIN RSA PRIVATE KEY-----\n"\
+"MIIEpQIBAAKCAQEAsRLypD2uhZNZgtfPAuX8M3ZFNYcBU/BHulG9CJrETKwmjXOV\n"\
+"j1l9U/Tlu3p/hGIFEhrkbqt1SGvPEj8x7U5kyCpJde1JojObW4m2S5T7WuXxd5JQ\n"\
+"Y+rqWkyrvwp/1HPFLRB3n3OopGaUcnEZwegsMznUcsi+kZwrUDkqBWFIQbEEKjW8\n"\
+"UzZxqmbmNSCsJQXHCv9OPrKdeisBnkQrpRkTz4uSG3yZI6jG7acx3UZkMcc6DvDo\n"\
+"bbz8PoBisZq4JcKthwpQdiV1RdS4aqCc0wq5Jv7DvhifqNcrOK3PT+zkck82jqIC\n"\
+"VDd58NkY6Y0URIyqjPCPPIltCbrAB/+u41rrtQIDAQABAoIBAQCQAhvprOxpX+u1\n"\
+"OLP35HjWlYI1xSU0Ub7T7bPx8oRg4sS711uz6JC/nfTUIwzf6iO7lLlgs/q/OkZ+\n"\
+"zXxaRZ47GAEEckWnL5dSu83Q7En7o/RcTVcp25xace5fgTdy3fBm9PSEbjih83cZ\n"\
+"F5heFecUhhyceVxa6YpkRQlCtNph6SwFfsY1BmfhHISHh4U7XYityUatdalQfOtL\n"\
+"Vf79TRIE/X1aX/H/xXYsqNQPCSGUzNj1BU5aHOM93B+hNg8q1t+Ze5w6Q/HkMBTb\n"\
+"5VPI8fabvaAV6WUrrWtEl8ErcokutYWNRadXH0ieCGiuI2uoK0qqgrBb2MwZwv81\n"\
+"ZtzCm3QlAoGBAOj5zlZtcWN5Mfb9PHonPSwFPE4pud2fZCJjO9btQWb6ELYwp9qW\n"\
+"2aRaoaQm9bA7pTwMaSRQYGC9eKPu8hu+cqPXJZ1gg1GrYP+IfJMChDAM0x7Faks4\n"\
+"B7ZDjfQlRGUJGAkqLQ4/4+k2y75KtZdnri5Z40myh4f0+PuiDDRwPcGjAoGBAMKS\n"\
+"2VuNefMvzqKW7g/drRLzChudUL96r2BWI8nkl7S9UChtKVgdqJcrNSiKXbTv0wLn\n"\
+"pWsnlOIxPVJAi1u5we045U+ZQadgIg4UqeIBVfRVKm4ZKrInSCT4uMriGDDJuvQl\n"\
+"NXBv9PIX8WCaPWpG2rcsOFsi0mNBcImVHMAhc2LHAoGBAIk6k8Ku5opMWhT9J0Fg\n"\
+"mZSzZMk5pMSZXXcv8pBv4gVRKMTYNhb4oixAQlQZqsBq8bJEMS51tb9l+4i8d5nF\n"\
+"/WrqkLp5ngBeLV13PMGvSsOu2jCW4jx6PXirpBL6XKYSzDihwjZRheLaJvrosLwF\n"\
+"E0E0K0A+y7xWnM5DrmK49nd3AoGAQdp70F24yZMDp8nXdu07F6/EWwZKfxQh6UQe\n"\
+"RsWkhtqQF66ikJ0xI0DPdBIolwWYcGJAfVzfKhMqQv1vbTMYrJZWHjOrod+KhyN9\n"\
+"P+3dzp1IiAzig3uCEmlP+fK95z1PljRFuvFZgNqTqnNpl9+1RMulo0rM1CUg1p/u\n"\
+"JCTuLZ8CgYEAwUsBplIARj4i+hhyVWC1WOR+I4AqgRAauCwliO9gvToJzjkQsc5q\n"\
+"RZxPbXLbm907wy6/7P/tKT20WhZ0b7szZsXchdeX20xSfAa4N0bJTZy3OiS0CYtF\n"\
+"3+Xw1Mlu3Gihr89X9QeSot0tH9m6QZky032aLW/8jbNT3Eb49niqQZA=\n"\
+"-----END RSA PRIVATE KEY-----";
+
+
+const char SSL_CA_PEM[] = \
+"-----BEGIN CERTIFICATE-----\n"\
+"MIIDQTCCAimgAwIBAgITBmyfz5m/jAo54vB4ikPmljZbyjANBgkqhkiG9w0BAQsF\n"\
+"ADA5MQswCQYDVQQGEwJVUzEPMA0GA1UEChMGQW1hem9uMRkwFwYDVQQDExBBbWF6\n"\
+"b24gUm9vdCBDQSAxMB4XDTE1MDUyNjAwMDAwMFoXDTM4MDExNzAwMDAwMFowOTEL\n"\
+"MAkGA1UEBhMCVVMxDzANBgNVBAoTBkFtYXpvbjEZMBcGA1UEAxMQQW1hem9uIFJv\n"\
+"b3QgQ0EgMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALJ4gHHKeNXj\n"\
+"ca9HgFB0fW7Y14h29Jlo91ghYPl0hAEvrAIthtOgQ3pOsqTQNroBvo3bSMgHFzZM\n"\
+"9O6II8c+6zf1tRn4SWiw3te5djgdYZ6k/oI2peVKVuRF4fn9tBb6dNqcmzU5L/qw\n"\
+"IFAGbHrQgLKm+a/sRxmPUDgH3KKHOVj4utWp+UhnMJbulHheb4mjUcAwhmahRWa6\n"\
+"VOujw5H5SNz/0egwLX0tdHA114gk957EWW67c4cX8jJGKLhD+rcdqsq08p8kDi1L\n"\
+"93FcXmn/6pUCyziKrlA4b9v7LWIbxcceVOF34GfID5yHI9Y/QCB/IIDEgEw+OyQm\n"\
+"jgSubJrIqg0CAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMC\n"\
+"AYYwHQYDVR0OBBYEFIQYzIU07LwMlJQuCFmcx7IQTgoIMA0GCSqGSIb3DQEBCwUA\n"\
+"A4IBAQCY8jdaQZChGsV2USggNiMOruYou6r4lK5IpDB/G/wkjUu0yKGX9rbxenDI\n"\
+"U5PMCCjjmCXPI6T53iHTfIUJrU6adTrCC2qJeHZERxhlbI1Bjjt/msv0tadQ1wUs\n"\
+"N+gDS63pYaACbvXy8MWy7Vu33PqUXHeeE6V/Uq2V8viTO96LXFvKWlJbYK8U90vv\n"\
+"o/ufQJVtMVT8QtPHRh8jrdkPSHCa2XV4cdFyQzR1bldZwgJcJmApzyMZFo6IQ6XU\n"\
+"5MsI+yMRQ+hDKXJioaldXgjUkK642M4UwtBV8ob2xJNDd2ZhwLnoQdeXeGADbkpy\n"\
+"rqXRfboQnoZsG4q5WTP468SQvvG5\n"\
+"-----END CERTIFICATE-----";

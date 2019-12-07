@@ -3,7 +3,7 @@
 #include "temperatureThread.h"
 #include "displayThread.h"
 
-DigitalOut led1(LED1);
+static DigitalOut led1(LED1);
 
 void blinkThread()
 {

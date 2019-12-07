@@ -4,25 +4,37 @@
 #include "cycfg.h"
 #include "temperatureThread.h"
 
-/***************************************
-* Function Prototypes
-**************************************/
-void CapSense_InterruptHandler(void);
-void CapSenseEndOfScanCallback(cy_stc_active_scan_sns_t * ptrActiveScan);
+static Semaphore capsense_sem;
 
-/*******************************************************************************
-* Interrupt configuration
-*******************************************************************************/
-const cy_stc_sysint_t CapSense_ISR_cfg =
+
+/*****************************************************************************
+* Function Name: CapSense_InterruptHandler()
+******************************************************************************
+* Summary:
+*  Wrapper function for handling interrupts from CSD block.
+*
+*****************************************************************************/
+static void CapSense_InterruptHandler(void)
 {
-    .intrSrc = CYBSP_CSD_IRQ,
-    .intrPriority = 4u
-};
+    Cy_CapSense_InterruptHandler(CYBSP_CSD_HW, &cy_capsense_context);
+}
 
-/*******************************************************************************
-* Global variables
-*******************************************************************************/
-Semaphore capsense_sem;
+
+/*****************************************************************************
+* Function Name: CapSenseEndOfScanCallback()
+******************************************************************************
+* Summary:
+*  This function releases a semaphore to indicate end of a CapSense scan.
+*
+* Parameters:
+*  cy_stc_active_scan_sns_t* : pointer to active sensor details.
+*
+*****************************************************************************/
+static void CapSenseEndOfScanCallback(cy_stc_active_scan_sns_t * ptrActiveScan)
+{
+    capsense_sem.release();
+}
+
 
 void capsenseThread(void)
 {
@@ -39,6 +51,11 @@ void capsenseThread(void)
     /* Initialize the CSD HW block to the default state. */
     Cy_CapSense_Init(&cy_capsense_context);
 
+    const cy_stc_sysint_t CapSense_ISR_cfg =
+    {
+        .intrSrc = CYBSP_CSD_IRQ,
+        .intrPriority = 4u
+    };
     /* Initialize CapSense interrupt */
     Cy_SysInt_Init(&CapSense_ISR_cfg, &CapSense_InterruptHandler);
     NVIC_ClearPendingIRQ(CapSense_ISR_cfg.intrSrc);
@@ -48,8 +65,7 @@ void capsenseThread(void)
     Cy_CapSense_Enable(&cy_capsense_context);
     Cy_CapSense_RegisterCallback(CY_CAPSENSE_END_OF_SCAN_E, CapSenseEndOfScanCallback, &cy_capsense_context);
 
-    Cy_CapSense_ScanAllWidgets(&cy_capsense_context);  
-    
+    Cy_CapSense_ScanAllWidgets(&cy_capsense_context);  // Launch the initial scan   
     
     uint32_t prevBtn0Status = 0u; 
     uint32_t prevBtn1Status = 0u;
@@ -81,33 +97,3 @@ void capsenseThread(void)
 
     }
 }
-
-
-/*****************************************************************************
-* Function Name: CapSense_InterruptHandler()
-******************************************************************************
-* Summary:
-*  Wrapper function for handling interrupts from CSD block.
-*
-*****************************************************************************/
-void CapSense_InterruptHandler(void)
-{
-    Cy_CapSense_InterruptHandler(CYBSP_CSD_HW, &cy_capsense_context);
-}
-
-
-/*****************************************************************************
-* Function Name: CapSenseEndOfScanCallback()
-******************************************************************************
-* Summary:
-*  This function releases a semaphore to indicate end of a CapSense scan.
-*
-* Parameters:
-*  cy_stc_active_scan_sns_t* : pointer to active sensor details.
-*
-*****************************************************************************/
-void CapSenseEndOfScanCallback(cy_stc_active_scan_sns_t * ptrActiveScan)
-{
-    capsense_sem.release();
-}
-
