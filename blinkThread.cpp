@@ -1,6 +1,6 @@
 #include "mbed.h"
 #include "blinkThread.h"
-#include "temperature.h"
+#include "temperatureThread.h"
 #include "displayThread.h"
 
 DigitalOut led1(LED1);

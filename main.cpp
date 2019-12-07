@@ -1,6 +1,6 @@
 #include "mbed.h"
 #include "blinkThread.h"
-#include "temperature.h"
+#include "temperatureThread.h"
 #include "GUI.h"
 #include "displayThread.h"
 #include "capsenseThread.h"
@@ -59,7 +59,7 @@ int main()
 
         if(blinkThreadHandle.get_state() == Thread::Deleted)
         {
-            ntpThreadHandle.start(NTPThread);
+            ntpThreadHandle.start(ntpThread);
             blinkThreadHandle.start(blinkThread);
             displayThreadHandle.start(displayThread);
             temperatureThreadHandle.start(temperatureThread);

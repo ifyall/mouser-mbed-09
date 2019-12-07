@@ -73,6 +73,7 @@ void displaySendUpdateMode(float mode)
 void guiInit()
 {
     printf("\033[2J\033[H"); // Clear Screen and go Home
+    printf("\033[?25l"); // Turn the cursor off
     fflush(stdout);
 
     #ifdef TARGET_CY8CKIT_062_WIFI_BT

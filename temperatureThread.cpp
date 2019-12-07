@@ -1,8 +1,16 @@
 #include "mbed.h"
-#include "temperature.h"
+#include "temperatureThread.h"
 #include "displayThread.h"
 
+
+#ifdef TARGET_CY8CPROTO_062_4343W
 #define THERMISTOR
+#endif
+
+#ifdef TARGET_CY8CKIT_062_WIFI_BT
+#define TMP36
+#endif
+
 
 static float temperatureF;
 static float setPoint = 75.0;

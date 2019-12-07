@@ -2,7 +2,7 @@
 #include "cy_pdl.h"
 #include "cycfg_capsense.h"
 #include "cycfg.h"
-#include "temperature.h"
+#include "temperatureThread.h"
 
 /***************************************
 * Function Prototypes

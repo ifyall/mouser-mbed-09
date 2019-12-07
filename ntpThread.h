@@ -1,5 +1,5 @@
 #ifndef NTP_THREAD_H
 #define NTP_THREAD_H
-void NTPThread();
+void ntpThread();
 
 #endif
