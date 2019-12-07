@@ -126,6 +126,7 @@ void displayThread()
                     time_t rawtime;
                     struct tm * timeinfo;
                     time (&rawtime);
+                    rawtime = rawtime - (5*60*60); // UTC - 4hours ... serious hack which only works in winter
                     timeinfo = localtime (&rawtime);
                     strftime (buffer,sizeof(buffer),"%r",timeinfo);
                     displayAtXY(1,3, buffer);
