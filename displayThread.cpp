@@ -86,7 +86,7 @@ void displayThread()
 {
     char buffer[128];
 
-    printf("\033[2J\033[H"); // Clear Screen and go Home
+    //printf("\033[2J\033[H"); // Clear Screen and go Home
     printf("\033[?25l"); // Turn the cursor off
     fflush(stdout);
 
@@ -106,11 +106,11 @@ void displayThread()
             {
                 case CMD_temperature:
                     sprintf(buffer,"Temperature = %2.1fF",message->value);
-                    displayAtXY(1, 1, buffer);
+                    displayAtXY(1, 10, buffer);
                 break;
                 case CMD_setPoint:
                     sprintf(buffer,"Set Point = %2.1fF",message->value);
-                    displayAtXY(1, 2, buffer);
+                    displayAtXY(1, 11, buffer);
                 break;
                 case CMD_time:
                     time_t rawtime;
@@ -119,7 +119,7 @@ void displayThread()
                     rawtime = rawtime - (5*60*60); // UTC - 4hours ... serious hack which only works in winter
                     timeinfo = localtime (&rawtime);
                     strftime (buffer,sizeof(buffer),"%r",timeinfo);
-                    displayAtXY(1,3, buffer);
+                    displayAtXY(1,12, buffer);
                 break;
                 case CMD_mode:
                     if(message->value == 0.0)
@@ -128,7 +128,7 @@ void displayThread()
                         sprintf(buffer,"Mode = Heat");
                     else
                         sprintf(buffer,"Mode = Cool");
-                    displayAtXY(1, 4, buffer);
+                    displayAtXY(1, 13, buffer);
                 break;
 
             }
